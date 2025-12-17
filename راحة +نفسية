@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Comfort Playground</title>
+<style>
+  :root {
+    --bg: #0e1014;
+    --card: #161a22;
+    --text: #e7ecf5;
+    --accent: #4cc9f0;
+    --accent2: #f72585;
+    --green: #57cc99;
+    --yellow: #ffd166;
+  }
+  body {
+    margin: 0;
+    background: radial-gradient(1200px circle at 80% -20%, #18202e 0%, var(--bg) 45%, #0a0c10 100%);
+    color: var(--text);
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  }
+  header {
+    padding: 24px;
+    text-align: center;
+  }
+  h1 {
+    margin: 0 0 8px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+  }
+  .sub {
+    opacity: 0.85;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    gap: 14px;
+    padding: 18px;
+    max-width: 1200px;
+    margin: 0 auto 24px;
+  }
+  .card {
+    background: linear-gradient(180deg, #1a2030 0%, var(--card) 100%);
+    border: 1px solid #242a38;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .card h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+  }
+  .btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  button {
+    cursor: pointer;
+    border: 1px solid #2c3242;
+    background: #1f2433;
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: transform 0.08s ease, background 0.2s ease, border 0.2s ease;
+    font-weight: 600;
+  }
+  button:hover { transform: translateY(-2px); background: #2a3042; border-color: #3a4056; }
+  button.stop { background: #2a1f2a; border-color: #4a2a4a; }
+  .stage {
+    position: relative;
+    height: 46vh;
+    min-height: 320px;
+    margin: 0 auto 24px;
+    max-width: 1200px;
+    border-top: 1px solid #242a38;
+    border-bottom: 1px solid #242a38;
+    background: linear-gradient(180deg, rgba(76,201,240,0.06), rgba(247,37,133,0.06));
+    overflow: hidden;
+  }
+
+  /* Rain numbers */
+  .drop {
+    position: absolute;
+    font-weight: 800;
+    color: #a8dadc;
+    opacity: 0.9;
+    animation: fall linear forwards;
+    text-shadow: 0 2px 12px rgba(168,218,220,0.5);
+  }
+  @keyframes fall {
+    0% { transform: translateY(-40px); opacity: 0.95; }
+    100% { transform: translateY(120vh); opacity: 0.2; }
+  }
+
+  /* Blue & red light */
+  .light {
+    position: absolute;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    filter: blur(22px) contrast(1.2);
+    mix-blend-mode: screen;
+    opacity: 0.85;
+    animation: float 5s ease-in-out forwards;
+  }
+  .light.blue { background: radial-gradient(circle, rgba(76,201,240,0.9), rgba(76,201,240,0.1)); left: 10%; top: 10%; }
+  .light.red  { background: radial-gradient(circle, rgba(247,37,133,0.9), rgba(247,37,133,0.1)); right: 10%; top: 40%; }
+  @keyframes float {
+    0%   { transform: translate(0,0) scale(1); }
+    50%  { transform: translate(220px, -60px) scale(1.2); }
+    100% { transform: translate(0, 0) scale(1); opacity: 0; }
+  }
+
+  /* Emoji face bubble */
+  .bubble {
+    position: absolute;
+    bottom: 14px; left: 14px;
+    background: #1f2433;
+    border: 1px solid #2c3242;
+    color: var(--text);
+    padding: 10px 12px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    display: flex; gap: 10px; align-items: center;
+    animation: bubbleIn 280ms ease-out;
+  }
+  @keyframes bubbleIn {
+    from { transform: translateY(10px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+  .bubble .emoji { font-size: 26px; }
+  .bubble .text { font-size: 14px; opacity: 0.9; }
+
+  /* Animals eat rock */
+  .rock {
+    position: absolute;
+    bottom: 22px; right: 22px;
+    font-size: 28px;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+  }
+  .animal {
+    position: absolute;
+    font-size: 26px;
+    transition: transform 0.4s ease;
+  }
+
+  /* Black screen overlay */
+  .overlay {
+    position: absolute; inset: 0;
+    background: radial-gradient(2000px circle at 50% 50%, #0f0f12 0%, #000 55%, #000 100%);
+    animation: overlayIn 300ms ease;
+  }
+  @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Sparkles attractor */
+  .sparkle {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: radial-gradient(circle, #ffd166, #f94144);
+    border-radius: 50%;
+    box-shadow: 0 0 12px #ffd166, 0 0 20px #f94144;
+    animation: sparkleFly 1.4s ease-out forwards;
+  }
+  @keyframes sparkleFly {
+    0% { transform: translate(0,0) scale(0.6); opacity: 0.9; }
+    100% { transform: translate(40px,-60px) scale(1.2); opacity: 0; }
+  }
+
+  /* Breathing guide */
+  .breath {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    pointer-events: none;
+  }
+  .circle {
+    width: 140px; height: 140px; border-radius: 50%;
+    border: 2px dashed #4cc9f0;
+    animation: breathe 8s ease-in-out infinite;
+    filter: drop-shadow(0 3px 16px rgba(76,201,240,0.25));
+  }
+  @keyframes breathe {
+    0%   { transform: scale(0.85); }
+    50%  { transform: scale(1.2); }
+    100% { transform: scale(0.85); }
+  }
+  .breathText { margin-top: 8px; opacity: 0.85; font-weight: 700; color: #a8dadc; }
+
+  /* Carousel images */
+  .img {
+    position: absolute;
+    width: 140px; height: 90px;
+    border-radius: 10px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #2c3242;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    animation: imgMove 2.8s ease-in-out forwards;
+  }
+  @keyframes imgMove {
+    0% { transform: translateY(10px); opacity: 0; }
+    50% { transform: translateY(-12px); opacity: 0.95; }
+    100% { transform: translateY(10px); opacity: 0; }
+  }
+
+  /* Extra calm events tags */
+  .tag {
+    display: inline-block;
+    margin-top: 8px;
+    color: #a8dadc;
+    font-size: 12px;
+    opacity: 0.75;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>ملعب الراحة الرقمية</h1>
+  <div class="sub">20 حدثًا تفاعليًا: أضواء، موسيقى، مؤثرات، وكلام لطيف</div>
+</header>
+
+<div class="grid">
+  <!-- 1 Rain numbers -->
+  <div class="card">
+    <h3>1) مطر الأرقام المستمر</h3>
+    <div class="btns">
+      <button onclick="startNumberRain()">بدء المطر</button>
+      <button class="stop" onclick="stopNumberRain()">إيقاف</button>
+    </div>
+    <span class="tag">يستمر حتى تضغط إيقاف</span>
+  </div>
+
+  <!-- 2 Blue/Red light -->
+  <div class="card">
+    <h3>2) ضوء أزرق وأحمر يتحرك 5 ثوان</h3>
+    <div class="btns">
+      <button onclick="blueRedLight()">تشغيل</button>
+    </div>
+  </div>
+
+  <!-- 3 Cat purr (50s) -->
+  <div class="card">
+    <h3>3) صوت خرير قطة (50 ثانية)</h3>
+    <div class="btns">
+      <button onclick="playCatPurr()">تشغيل</button>
+      <button class="stop" onclick="stopAudio()">إيقاف الصوت</button>
+    </div>
+  </div>
+
+  <!-- 4 Emoji speaks -->
+  <div class="card">
+    <h3>4) وجه إيموجي مبتسم يتكلم مع اللاعب</h3>
+    <div class="btns">
+      <button onclick="emojiSpeak()">تشغيل</button>
+    </div>
+  </div>
+
+  <!-- 5 Calm music -->
+  <div class="card">
+    <h3>5) موسيقى هادئة قصيرة</h3>
+    <div class="btns">
+      <button onclick="playCalmMusic()">تشغيل</button>
+      <button class="stop" onclick="stopAudio()">إيقاف الصوت</button>
+    </div>
+  </div>
+
+  <!-- 6 Animals eat rock -->
+  <div class="card">
+    <h3>6) حيوانات كثيرة تأكل الحجر بسرعة</h3>
+    <div class="btns">
+      <button onclick="animalsEatRock()">تشغيل</button>
+    </div>
+  </div>
+
+  <!-- 7 Pretty black screen -->
+  <div class="card">
+    <h3>7) شاشة سوداء حلوة</h3>
+    <div class="btns">
+      <button onclick="blackScreen()">تشغيل</button>
+    </div>
+  </div>
+
+  <!-- 8 Something attractive -->
+  <div class="card">
+    <h3>8) شيء يجذب اللاعب (شرارات لطيفة)</h3>
+    <div class="btns">
+      <button onclick="attractor()">تشغيل</button>
+    </div>
+  </div>
+
+  <!-- 9 Mental comfort -->
+  <div class="card">
+    <h3>9) راحة نفسية (دليل تنفس)</h3>
+    <div class="btns">
+      <button onclick="breathingGuide()">تشغيل</button>
+    </div>
+  </div>
+
+  <!-- 10 Images carousel -->
+  <div class="card">
+    <h3>10) صور كثيرة تروح وتجي</h3>
+    <div class="btns">
+      <button onclick="imagesComeAndGo()">تشغيل</button>
+    </div>
+  </div>
+
+  <!-- Extra 10 calm/creative events -->
+  <div class="card">
+    <h3>11) موج ضوئي هادئ</h3>
+    <div class="btns"><button onclick="lightWave()">تشغيل</button></div>
+  </div>
+  <div class="card">
+    <h3>12) نجوم تتلألأ</h3>
+    <div class="btns"><button onclick="stars()">تشغيل</button></div>
+  </div>
+  <div class="card">
+    <h3>13) نقر خشبي لطيف</h3>
+    <div class="btns">
+      <button onclick="softClicks()">تشغيل</button>
+      <button class="stop" onclick="stopAudio()">إيقاف الصوت</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>14) رسالة طمأنة فورية</h3>
+    <div class="btns"><button onclick="affirmation()">تشغيل</button></div>
+  </div>
+  <div class="card">
+    <h3>15) شلال ألوان بسيط</h3>
+    <div class="btns"><button onclick="colorCascade()">تشغيل</button></div>
+  </div>
+  <div class="card">
+    <h3>16) هالة حماية حولك</h3>
+    <div class="btns"><button onclick="protectiveAura()">تشغيل</button></div>
+  </div>
+  <div class="card">
+    <h3>17) رمل يتحرك بهدوء</h3>
+    <div class="btns"><button onclick="movingSand()">تشغيل</button></div>
+  </div>
+  <div class="card">
+    <h3>18) ساعة هادئة</h3>
+    <div class="btns"><button onclick="calmClock()">تشغيل</button></div>
+  </div>
+  <div class="card">
+    <h3>19) شجرة تنمو</h3>
+    <div class="btns"><button onclick="growingTree()">تشغيل</button></div>
+  </div>
+  <div class="card">
+    <h3>20) قطرات ضوء دائرية</h3>
+    <div class="btns"><button onclick="ringDrops()">تشغيل</button></div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3>إيقاف عام للمؤثرات المستمرة</h3>
+    <div class="btns">
+      <button class="stop" onclick="stopAll()">إيقاف الكل</button>
+    </div>
+  </div>
+</div>
+
+<div id="stage" class="stage"></div>
+
+<script>
+  const stage = document.getElementById('stage');
+
+  /* ====== Helpers ====== */
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function removeAfter(el, ms=2000) { setTimeout(()=>el.remove(), ms); }
+
+  /* ====== Audio Engine (Web Audio) ====== */
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let audioNodes = []; // track nodes to stop
+  function stopAudio() {
+    audioNodes.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch(e){} });
+    audioNodes = [];
+  }
+
+  /* ====== 1 Rain numbers ====== */
+  let rainTimer = null;
+  function startNumberRain() {
+    if (rainTimer) return;
+    rainTimer = setInterval(() => {
+      const d = document.createElement('div');
+      d.className = 'drop';
+      d.textContent = Math.floor(rand(0, 9999));
+      d.style.left = rand(0, stage.clientWidth - 50) + 'px';
+      d.style.fontSize = rand(16, 28) + 'px';
+      d.style.animationDuration = rand(3, 8) + 's';
+      stage.appendChild(d);
+      removeAfter(d, 9000);
+    }, 90);
+  }
+  function stopNumberRain() {
+    clearInterval(rainTimer);
+    rainTimer = null;
+  }
+
+  /* ====== 2 Blue & Red Light (5s) ====== */
+  function blueRedLight() {
+    ['blue','red'].forEach(c => {
+      const l = document.createElement('div');
+      l.className = `light ${c}`;
+      stage.appendChild(l);
+      removeAfter(l, 5200);
+    });
+  }
+
+  /* ====== 3 Cat purr (50s) ====== */
+  function playCatPurr() {
+    stopAudio();
+    const carrier = audioCtx.createOscillator();
+    const mod = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    carrier.type = 'sawtooth';
+    carrier.frequency.value = 55; // low rumble
+    mod.type = 'sine';
+    mod.frequency.value = 22; // gentle amplitude modulation
+    const modGain = audioCtx.createGain();
+    modGain.gain.value = 0.35;
+
+    mod.connect(modGain);
+    modGain.connect(gain.gain);
+
+    carrier.connect(gain);
+    gain.connect(audioCtx.destination);
+    gain.gain.value = 0.05;
+
+    const now = audioCtx.currentTime;
+    gain.gain.setTargetAtTime(0.08, now, 0.8); // fade in
+    setTimeout(() => {
+      gain.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.6); // fade out
+    }, 48000);
+
+    carrier.start();
+    mod.start();
+    const stopNode = { stop: () => { carrier.stop(); mod.stop(); } };
+    audioNodes.push(stopNode);
+    setTimeout(() => stopAudio(), 50000);
+  }
+
+  /* ====== 4 Emoji speaks ====== */
+  function emojiSpeak() {
+    const lines = [
+      "أهلاً! أنت على الطريق الصحيح.",
+      "تنفّس… خطوة خطوة، كل شيء تمام.",
+      "إنجازك اليوم جميل. خليه يكبر بكرة.",
+      "أنا هنا لأذكّرك: الهدوء قوة."
+    ];
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.innerHTML = `<div class="emoji">😊</div><div class="text">${pick(lines)}</div>`;
+    stage.appendChild(b);
+    removeAfter(b, 6000);
+
+    const msg = new SpeechSynthesisUtterance(pick(lines));
+    msg.lang = 'ar';
+    msg.rate = 0.95;
+    window.speechSynthesis.speak(msg);
+  }
+
+  /* ====== 5 Calm music ====== */
+  function playCalmMusic() {
+    stopAudio();
+    const master = audioCtx.createGain(); master.gain.value = 0.06;
+    master.connect(audioCtx.destination);
+
+    const notes = [261.63, 329.63, 392.00, 523.25]; // C4 E4 G4 C5
+    let t = audioCtx.currentTime;
+    for (let i=0; i<24; i++) {
+      const f = pick(notes);
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.2, t+0.3);
+      g.gain.linearRampToValueAtTime(0.0, t+2.0);
+      o.connect(g); g.connect(master);
+      o.start(t);
+      o.stop(t+2.05);
+      audioNodes.push(o);
+      t += 2.5;
+    }
+  }
+
+  /* ====== 6 Animals eat rock ====== */
+  function animalsEatRock() {
+    const rock = document.createElement('div');
+    rock.className = 'rock';
+    rock.textContent = '🪨';
+    stage.appendChild(rock);
+
+    const animals = ['🐱','🐶','🦊','🐵','🐼','🐸','🐻','🦁','🐯','🐹','🐰','🐨','🦄','🐮','🐷'];
+    for (let i=0; i<22; i++) {
+      const a = document.createElement('div');
+      a.className = 'animal';
+      a.textContent = pick(animals);
+      a.style.left = rand(0, stage.clientWidth-40)+'px';
+      a.style.top  = rand(0, stage.clientHeight-80)+'px';
+      stage.appendChild(a);
+      setTimeout(() => {
+        a.style.transform = `translate(${stage.clientWidth-60 - a.offsetLeft}px, ${stage.clientHeight-60 - a.offsetTop}px)`;
+        removeAfter(a, 700);
+      }, rand(120, 500));
+    }
+    setTimeout(()=>rock.remove(), 1200);
+  }
+
+  /* ====== 7 Black screen ====== */
+  function blackScreen() {
+    const o = document.createElement('div');
+    o.className = 'overlay';
+    stage.appendChild(o);
+    setTimeout(()=>o.remove(), 2500);
+  }
+
+  /* ====== 8 Attractor sparkles ====== */
+  function attractor() {
+    for (let i=0; i<40; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.left = rand(20, stage.clientWidth-40)+'px';
+      s.style.top  = rand(20, stage.clientHeight-40)+'px';
+      stage.appendChild(s);
+      removeAfter(s, 1600);
+    }
+  }
+
+  /* ====== 9 Breathing guide ====== */
+  function breathingGuide() {
+    const b = document.createElement('div');
+    b.className = 'breath';
+    b.innerHTML = `<div class="circle"></div><div class="breathText">شهيق ٤ ثوان… زفير ٤ ثوان</div>`;
+    stage.appendChild(b);
+    setTimeout(()=>b.remove(), 14000);
+  }
+
+  /* ====== 10 Images come & go ====== */
+  function imagesComeAndGo() {
+    const samples = [
+      'linear-gradient(135deg,#4cc9f0,#4361ee)',
+      'linear-gradient(135deg,#f72585,#b5179e)',
+      'linear-gradient(135deg,#57cc99,#80ed99)',
+      'linear-gradient(135deg,#ffd166,#06d6a0)',
+      'linear-gradient(135deg,#e63946,#ff9f1c)'
+    ];
+    for (let i=0; i<16; i++) {
+      const img = document.createElement('div');
+      img.className = 'img';
+      img.style.left = rand(10, stage.clientWidth-150)+'px';
+      img.style.top  = rand(10, stage.clientHeight-100)+'px';
+      img.style.background = pick(samples);
+      stage.appendChild(img);
+      removeAfter(img, 3000);
+    }
+  }
+
+  /* ====== 11 Light wave ====== */
+  function lightWave() {
+    for (let i=0; i<12; i++) {
+      const l = document.createElement('div');
+      l.className = 'light';
+      l.style.left = rand(0, stage.clientWidth-160)+'px';
+      l.style.top = rand(0, stage.clientHeight-160)+'px';
+      l.style.background = `radial-gradient(circle, rgba(${Math.floor(rand(50,255))},${Math.floor(rand(50,255))},${Math.floor(rand(50,255))},0.9), rgba(255,255,255,0.05))`;
+      stage.appendChild(l);
+      removeAfter(l, 2600);
+    }
+  }
+
+  /* ====== 12 Stars ====== */
+  function stars() {
+    for (let i=0; i<80; i++) {
+      const s = document.createElement('div');
+      s.className = 'sparkle';
+      s.style.left = rand(0, stage.clientWidth)+'px';
+      s.style.top  = rand(0, stage.clientHeight)+'px';
+      stage.appendChild(s);
+      removeAfter(s, 1400);
+    }
+  }
+
+  /* ====== 13 Soft clicks ====== */
+  function softClicks() {
+    stopAudio();
+    const master = audioCtx.createGain(); master.gain.value = 0.09;
+    master.connect(audioCtx.destination);
+    let t = audioCtx.currentTime;
+    for (let i=0;i<24;i++){
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'square';
+      o.frequency.value = rand(800, 1400);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.18, t+0.02);
+      g.gain.linearRampToValueAtTime(0.0, t+0.14);
+      o.connect(g); g.connect(master);
+      o.start(t); o.stop(t+0.15);
+      audioNodes.push(o);
+      t += rand(0.18, 0.35);
+    }
+  }
+
+  /* ====== 14 Affirmation ====== */
+  function affirmation() {
+    const phrases = [
+      "أنت بخير. كل شيء تحت السيطرة.",
+      "إنجاز اليوم يكفي. ارتاح.",
+      "خطوة صغيرة اليوم… تأثير كبير غدًا.",
+      "تنفّس، واسمح للهدوء يملأ المكان."
+    ];
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.innerHTML = `<div class="emoji">🫶</div><div class="text">${pick(phrases)}</div>`;
+    stage.appendChild(b);
+    removeAfter(b, 5000);
+  }
+
+  /* ====== 15 Color cascade ====== */
+  function colorCascade() {
+    for (let i=0; i<18; i++) {
+      const d = document.createElement('div');
+      d.className = 'drop';
+      d.textContent = '';
+      d.style.left = rand(0, stage.clientWidth-50)+'px';
+      d.style.width = '12px'; d.style.height = '44px';
+      d.style.background = `linear-gradient(180deg, rgba(${Math.floor(rand(0,255))},${Math.floor(rand(0,255))},${Math.floor(rand(0,255))},0.8), transparent)`;
+      d.style.animationDuration = rand(2.5, 6)+'s';
+      stage.appendChild(d);
+      removeAfter(d, 7000);
+    }
+  }
+
+  /* ====== 16 Protective aura ====== */
+  function protectiveAura() {
+    const aura = document.createElement('div');
+    aura.className = 'breath';
+    aura.innerHTML = `<div class="circle" style="border-color:#57cc99"></div><div class="breathText" style="color:#57cc99">أنت في أمان الآن</div>`;
+    stage.appendChild(aura);
+    setTimeout(()=>aura.remove(), 8000);
+  }
+
+  /* ====== 17 Moving sand ====== */
+  function movingSand() {
+    for (let i=0;i<120;i++){
+      const grain = document.createElement('div');
+      grain.style.position='absolute';
+      grain.style.width='3px'; grain.style.height='3px';
+      grain.style.borderRadius='50%';
+      grain.style.background='#c2b280';
+      grain.style.left = rand(0, stage.clientWidth)+'px';
+      grain.style.top  = rand(stage.clientHeight-80, stage.clientHeight-10)+'px';
+      stage.appendChild(grain);
+      const dx = rand(-60,60), dy = rand(-30,0);
+      grain.animate([{transform:'translate(0,0)'},{transform:`translate(${dx}px,${dy}px)`}], {duration: 1600, easing:'ease-out', fill:'forwards'});
+      removeAfter(grain, 1800);
+    }
+  }
+
+  /* ====== 18 Calm clock ====== */
+  function calmClock() {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const now = new Date();
+    b.innerHTML = `<div class="emoji">🕰️</div><div class="text">الوقت الآن: ${now.toLocaleTimeString()} — خليه يمشي بهدوء</div>`;
+    stage.appendChild(b);
+    removeAfter(b, 6000);
+  }
+
+  /* ====== 19 Growing tree ====== */
+  function growingTree() {
+    const tree = document.createElement('div');
+    tree.style.position='absolute';
+    tree.style.left = '20px'; tree.style.bottom='22px';
+    tree.style.fontSize='18px';
+    tree.textContent='🌱';
+    stage.appendChild(tree);
+    let stages = ['🌱','🌿','🌳'];
+    let i = 0;
+    const timer = setInterval(()=>{
+      i++;
+      if (i>=stages.length){ clearInterval(timer); setTimeout(()=>tree.remove(), 1200); }
+      else { tree.textContent = stages[i]; tree.style.fontSize = (18 + i*12)+'px'; }
+    }, 900);
+  }
+
+  /* ====== 20 Ring drops ====== */
+  function ringDrops() {
+    for (let i=0;i<18;i++){
+      const r = document.createElement('div');
+      r.style.position='absolute';
+      r.style.left = rand(40, stage.clientWidth-40)+'px';
+      r.style.top  = rand(40, stage.clientHeight-40)+'px';
+      r.style.width='10px'; r.style.height='10px'; r.style.borderRadius='50%';
+      r.style.border='2px solid #4cc9f0';
+      stage.appendChild(r);
+      r.animate([{transform:'scale(0.6)', opacity:1},{transform:'scale(2.2)', opacity:0}], {duration: 1400, easing:'ease-out', fill:'forwards'});
+      removeAfter(r, 1500);
+    }
+  }
+
+  /* ====== Stop all ====== */
+  function stopAll() {
+    stopNumberRain();
+    stopAudio();
+    window.speechSynthesis.cancel();
+    // remove dynamic elements
+    [...stage.querySelectorAll('.drop,.light,.bubble,.animal,.overlay,.sparkle,.breath,.img,.rock')].forEach(el=>el.remove());
+  }
+</script>
+</body>
+</html>
